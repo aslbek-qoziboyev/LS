@@ -1,0 +1,5 @@
+src/ls_tools.py usr/lib/ls-linux-tools
+usr/bin/ls-linux-tools usr/bin
+usr/lib/ls-linux-tools/display-cycle usr/lib/ls-linux-tools
+usr/share/applications/ls-linux-tools.desktop usr/share/applications
+usr/share/icons/hicolor/scalable/apps/ls-linux-tools.svg usr/share/icons/hicolor/scalable/apps
