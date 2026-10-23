@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=LS Linux Tools
+Comment=LS-Linux touchpad gesture settings
+Exec=/usr/bin/ls-linux-tools
+Icon=ls-linux-tools
+Terminal=false
+Type=Application
+Categories=Settings;HardwareSettings;
