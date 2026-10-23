@@ -1,0 +1,13 @@
+Source: ls-linux-tools
+Section: utils
+Priority: optional
+Maintainer: LS Linux Tools <maintainers@example.invalid>
+Build-Depends: debhelper-compat (= 13)
+Standards-Version: 4.6.2
+Rules-Requires-Root: no
+
+Package: ls-linux-tools
+Architecture: all
+Depends: ${misc:Depends}, python3, python3-gi, gir1.2-gtk-3.0, touchegg, xinput, x11-xserver-utils
+Description: LS-Linux touchpad gesture settings
+ GTK settings utility for configuring selected touchpad gestures.
