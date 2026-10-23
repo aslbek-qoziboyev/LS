@@ -9,16 +9,45 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - name: Install build tools
-        run: sudo apt-get update && sudo apt-get install -y build-essential devscripts debhelper
-      - name: Prepare Debian build
-        run: chmod +x debian/rules
-      - name: Build .deb
-        run: dpkg-buildpackage -us -uc -b
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - name: Build .deb package
+        shell: bash
+        run: |
+          set -euxo pipefail
+          PKG="pkg/DEBIAN"
+          mkdir -p "$PKG"
+          mkdir -p pkg/usr/bin
+          mkdir -p pkg/usr/lib/ls-linux-tools
+          mkdir -p pkg/usr/share/applications
+          mkdir -p pkg/usr/share/icons/hicolor/scalable/apps
+
+          install -m 0755 usr/bin/ls-linux-tools pkg/usr/bin/ls-linux-tools
+          install -m 0644 src/ls_tools.py pkg/usr/lib/ls-linux-tools/ls_tools.py
+          install -m 0755 usr/lib/ls-linux-tools/display-cycle pkg/usr/lib/ls-linux-tools/display-cycle
+          install -m 0644 usr/share/applications/ls-linux-tools.desktop pkg/usr/share/applications/ls-linux-tools.desktop
+          install -m 0644 usr/share/icons/hicolor/scalable/apps/ls-linux-tools.svg pkg/usr/share/icons/hicolor/scalable/apps/ls-linux-tools.svg
+
+          cat > "$PKG/control" <<'EOF'
+          Package: ls-linux-tools
+          Version: 0.1.0
+          Section: utils
+          Priority: optional
+          Architecture: all
+          Maintainer: LS Linux Tools <noreply@github.com>
+          Depends: python3, python3-gi, gir1.2-gtk-3.0, touchegg, xinput, x11-xserver-utils
+          Description: LS-Linux touchpad gesture settings
+           GTK settings utility for configuring selected touchpad gestures.
+          EOF
+
+          dpkg-deb --build --root-owner-group pkg ls-linux-tools_0.1.0_all.deb
+          dpkg-deb --info ls-linux-tools_0.1.0_all.deb
+          dpkg-deb --contents ls-linux-tools_0.1.0_all.deb
+
       - name: Upload package
         uses: actions/upload-artifact@v4
         with:
           name: ls-linux-tools-deb
-          path: ../*.deb
+          path: ls-linux-tools_0.1.0_all.deb
           if-no-files-found: error
