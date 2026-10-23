@@ -16,11 +16,11 @@ if ! command -v apt-get >/dev/null 2>&1; then
   exit 1
 fi
 
-echo "[1/5] Updating package lists and installing download tools..."
+echo "[1/6] Updating package lists and installing download tools..."
 apt-get update
 apt-get install -y --no-install-recommends ca-certificates curl tar python3
 
-echo "[2/5] Downloading LS-Linux Tools source from GitHub..."
+echo "[2/6] Downloading LS-Linux Tools source from GitHub..."
 mkdir -p "$WORKDIR/source"
 curl --fail --location --silent --show-error "$ARCHIVE" | tar -xz --strip-components=1 -C "$WORKDIR/source"
 
