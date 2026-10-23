@@ -27,7 +27,16 @@ The `.deb` is created in the parent directory. A GitHub Actions workflow also bu
 - “Three-finger downward gesture” minimizes/shows the desktop rather than force-closing every application, protecting unsaved work.
 - Display aspect ratios can only be switched if the display exposes compatible modes. Rotation behavior differs between drivers and monitors.
 
-## Install
+## Install (recommended)
+
+On Kali Linux, Debian, or Ubuntu, run this command in a terminal. It downloads the installer from GitHub, builds the package, and uses APT to install the package plus any available dependencies automatically:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/aslbek-qoziboyev/LS/main/install.sh | sudo bash
+```
+
+The installer requires an internet connection and working APT repositories. If you already downloaded the `.deb` file, install it with APT rather than `dpkg -i` so APT can resolve dependencies:
+
 ```bash
 sudo apt install ./ls-linux-tools_0.1.0_all.deb
 ```
