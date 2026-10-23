@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 set -Eeuo pipefail
 
-REPO="https://github.com/aslbek-qoziboyev/LS"
 ARCHIVE="https://codeload.github.com/aslbek-qoziboyev/LS/tar.gz/refs/heads/main"
 WORKDIR="$(mktemp -d -t ls-linux-tools.XXXXXX)"
 trap 'rm -rf "$WORKDIR"' EXIT
@@ -19,7 +18,7 @@ fi
 
 echo "[1/5] Updating package lists and installing download tools..."
 apt-get update
-apt-get install -y --no-install-recommends ca-certificates curl tar
+apt-get install -y --no-install-recommends ca-certificates curl tar python3
 
 echo "[2/5] Downloading LS-Linux Tools source from GitHub..."
 mkdir -p "$WORKDIR/source"
@@ -41,7 +40,36 @@ for file in \
   fi
 done
 
-echo "[3/5] Preparing the Debian package..."
+echo "[3/6] Installing Touchégg from its official GitHub release..."
+ARCH="$(dpkg --print-architecture)"
+curl --fail --location --silent --show-error \
+  "https://api.github.com/repos/JoseExposito/touchegg/releases/latest" \
+  -o "$WORKDIR/touchegg-release.json"
+TOUCHEGG_URL="$(python3 - "$WORKDIR/touchegg-release.json" "$ARCH" <<'PY'
+import json
+import sys
+
+with open(sys.argv[1], encoding="utf-8") as file:
+    release = json.load(file)
+
+arch = sys.argv[2]
+assets = release.get("assets", [])
+asset = next(
+    (item for item in assets
+     if item.get("name", "").endswith(f"_{arch}.deb")
+     and item.get("name", "").startswith("touchegg_")),
+    None,
+)
+if asset is None:
+    print(f"No official Touchégg .deb asset found for architecture: {arch}", file=sys.stderr)
+    sys.exit(1)
+print(asset["browser_download_url"])
+PY
+)"
+curl --fail --location --silent --show-error "$TOUCHEGG_URL" -o "$WORKDIR/touchegg.deb"
+apt-get install -y "$WORKDIR/touchegg.deb"
+
+echo "[4/6] Preparing the Debian package..."
 mkdir -p "$DEBIAN" \
   "$PKG/usr/bin" \
   "$PKG/usr/lib/ls-linux-tools" \
@@ -71,9 +99,9 @@ chmod 0644 "$DEBIAN/control"
 DEB="$WORKDIR/ls-linux-tools_0.1.0_all.deb"
 dpkg-deb --build --root-owner-group "$PKG" "$DEB"
 
-echo "[4/5] Installing LS-Linux Tools and resolving dependencies..."
+echo "[5/6] Installing LS-Linux Tools and resolving dependencies..."
 apt-get install -y "$DEB"
 
-echo "[5/5] Installation complete."
+echo "[6/6] Installation complete."
 echo "Launch it from your application menu or run: ls-linux-tools"
 echo "If Touchégg was just installed, log out and back in if gestures do not work yet."
