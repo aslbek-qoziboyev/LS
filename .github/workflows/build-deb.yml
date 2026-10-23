@@ -12,6 +12,9 @@ jobs:
       - name: Checkout source
         uses: actions/checkout@v4
 
+      - name: Validate installer syntax
+        run: bash -n install.sh
+
       - name: Build .deb package
         shell: bash
         run: |
